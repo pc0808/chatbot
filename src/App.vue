@@ -1,85 +1,102 @@
 <script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
+import ChatUI from './components/ChatUI.vue';
+const SEND_IMAGE_LINK = "../src/assets/send_icon.png";
+const DEFAULT_INTRO = "Hello! You are chatting with Groupon's AI chat bot. How may I help you today?";
+
+const messages: Array<{msg: string, bot:boolean}> = [];
+messages.push({msg: DEFAULT_INTRO, bot:true});
 </script>
 
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
-
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
-
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
+  <div class="container">
+    <div class="header">
+      <h1>Groupon</h1>
+      <span>AI Chatbot</span>
     </div>
-  </header>
 
-  <RouterView />
+    <div class="chat-page">
+      <ChatUI msg="Incoming msg"></ChatUI>
+    </div>
+
+    <div class="input">
+      <div class="type-box">
+        <input id="user-input" placeholder="Start typing your inquiry here!"></input>
+        <button id="submit">
+          <img :src="SEND_IMAGE_LINK"height="25px">
+        </button>
+      </div>
+      
+      
+    </div>
+  </div>
 </template>
 
 <style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
+template{
+  align-items: center;
+  float: none;
 }
+.container{
+    background-color: var(--vt-c-white);
+    border: solid 2px var(--color-border);
+    width: 100vh;
+    height: 99vh;
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
+    position: relative;
 }
-
-nav {
+.header{
+  background-color: var(--vt-c-white-mute);
+  padding: 3% 5%;
+  border-bottom: solid 2px var(--color-border);
+}
+.chat-page{
+  padding: 2% 5%;
+  position: relative;
+}
+.input{
+  background-color: var(--vt-c-white-mute);
+  border-top: solid 2px var(--color-border);
+  padding: 2% 4.9%;
+  position: absolute;
+  bottom: 0%;
+  left: 0%;
+  right: 0%;
+}
+.type-box{
+  font-size: medium;
+  border: solid 2px var(--color-border);
+  border-radius: 15px;
+  margin-left: 0.1%;
   width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
   display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
+  padding: 0%;
 }
-
-nav a:first-of-type {
+#user-input{
+  padding: 2%;
+  background: none;
+  float: left;
+  width: 88%;
   border: 0;
 }
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
+#user-input:focus{
+  outline: none;
+}
+#submit{
+  background-color: transparent;
+  border: 0;
+  border-radius: 5%;
+  padding: 0%;
+  float: right;
+  width: 7%;
+  padding-top: 1.5%;
+}
+#submit:hover{
+  cursor: pointer;
+}
+img{
+  opacity: 50%;
+}
+img:hover{
+  opacity: 100%;
 }
 </style>
