@@ -5,7 +5,7 @@ import { storeToRefs } from 'pinia';
 import { useBotStore } from "@/stores/bot";
 const botStore = useBotStore();
 const { isDisabled } = storeToRefs(botStore); 
-const { enableInput, disableInput } = useBotStore();
+const { enableInput, disableInput, generateBotResponse } = useBotStore();
 //bot store is a very elaborate way to disable/enable inputs to keep up with LLM response 
 import ChatUI from './components/ChatUI.vue'; //styles each individual message 
 
@@ -15,7 +15,8 @@ const SEND_IMAGE_LINK = "../src/assets/send_icon.png";
 const DEFAULT_INTRO = "Hello! You are chatting with Groupon's AI chat bot. How may I help you today?";
 const DEFAULT_RESPONSE = "Hi! We're sorry for the inconvenience, but all our agents are offline at the moment. We appreciate your patience and understanding. Feel free to leave a message, and we'll be back to assist you soon!"
 //user request:
-let userInput = "";
+const userInput = ref("");
+const isLoading = ref(false);
 //controls whether input enabled, turned off during LLM API call: 
 
 interface M{
@@ -33,15 +34,19 @@ onBeforeMount(async () => {
 
 async function sendInput(){
   //adds input to msg base, automatically renders  
-  messages.value.push({msg: userInput, bot: false, time: new Date()}); 
-  
+  messages.value.push({msg: userInput.value, bot: false, time: new Date()}); 
+  userInput.value = "";
+
   //disables input
   disableInput();
+  isLoading.value = true;
 
   //process & render response:
-  const response = DEFAULT_RESPONSE;
-  messages.value.push({msg: response, bot: true, time: new Date()} ); 
+  //const response = DEFAULT_RESPONSE;
+  const response = await generateBotResponse(userInput.value); 
 
+  messages.value.push({msg: response, bot: true, time: new Date()} ); 
+  isLoading.value = false;
   //re-enables input when chatUI comp finishes typing!
 }
 </script>
@@ -58,7 +63,13 @@ async function sendInput(){
     <div class="chat-page">
       <ChatUI v-for="m in messages" :msg="m.msg" :bot="m.bot" :time="m.time"><br></ChatUI>
       <!-- loading message so user doesn't get bored  -->
-      <div v-if="isDisabled"></div> 
+      <div class="loader-container" v-if="isLoading">
+        <div class="loader">
+          <div></div>
+          <div></div>
+          <div></div>
+        </div>
+      </div>
     </div>
 
     <!-- input ui at the bottom -->
@@ -95,9 +106,48 @@ template{
   border-bottom: solid 2px var(--color-border);
 }
 .chat-page{
-  padding: 2% 5%;
+  padding: 0% 5% 2%;
   max-height: 65vh;
   overflow-y:auto
+}
+/* loading animation: */
+.loader-container {
+  display: flex;
+}
+
+.loader {
+  display: flex;
+  justify-content: space-between;
+  width: 10vh;
+}
+
+.loader div {
+  width: 16px;
+  height: 16px;
+  background-color: var(--color-border);
+  border-radius: 50%;
+  animation: grow-shrink 1.5s infinite;
+}
+
+.loader div:nth-child(1) {
+  animation-delay: 0s;
+}
+
+.loader div:nth-child(2) {
+  animation-delay: 0.3s;
+}
+
+.loader div:nth-child(3) {
+  animation-delay: 0.6s;
+}
+
+@keyframes grow-shrink {
+  0%, 100% {
+    transform: scale(1);
+  }
+  50% {
+    transform: scale(1.5);
+  }
 }
 .input{
   background-color: var(--vt-c-white-mute);
