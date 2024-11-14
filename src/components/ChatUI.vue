@@ -2,7 +2,7 @@
 import moment from "moment";
 import { storeToRefs } from "pinia";
 import { useBotStore } from "@/stores/bot";
-const { enableInput } = useBotStore();
+const { enableInput, disableInput } = useBotStore();
 const botStore = useBotStore();
 const { isDisabled } = storeToRefs(botStore); 
 import { ref } from "vue";
@@ -15,6 +15,7 @@ const props = defineProps<{
 let typeValue = ref(""); //iterating string for bot messages to appear like "typing"
 const typeEffect = () => {
   if (typeValue.value.length < props.msg.length) {
+    disableInput();
     typeValue.value += props.msg.charAt(typeValue.value.length);
     setTimeout(typeEffect, 50);
   } else{

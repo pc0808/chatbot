@@ -42,7 +42,7 @@ async function sendInput(){
   const response = DEFAULT_RESPONSE;
   messages.value.push({msg: response, bot: true, time: new Date()} ); 
 
-  //re-enable input when chatUI comp finishes typing!
+  //re-enables input when chatUI comp finishes typing!
 }
 </script>
 
@@ -64,7 +64,8 @@ async function sendInput(){
     <!-- input ui at the bottom -->
     <div class="input">
       <div class="type-box">
-        <input id="user-input" placeholder="Start typing your inquiry here!" v-model="userInput" :disabled="isDisabled"></input>
+        <input :class="{'user-input': isDisabled === false, 'user-input-disabled': isDisabled === true}" 
+                placeholder="Start typing your inquiry here!" v-model="userInput" :disabled="isDisabled"></input>
         <button id="submit" @click="sendInput">
           <img :src="SEND_IMAGE_LINK" height="25px">
         </button>
@@ -115,7 +116,7 @@ template{
   display: inline-block;
   padding: 0%;
 }
-#user-input{
+.user-input{
   padding: 2%;
   background: none;
   font-size: medium;
@@ -123,7 +124,20 @@ template{
   width: 88%;
   border: 0;
 }
-#user-input:focus{
+.user-input-disabled{
+  padding: 2%;
+  background: none;
+  font-size: medium;
+  float: left;
+  width: 88%;
+  border: 0;
+
+  opacity: 50%;
+}
+.user-input-disabled:hover{
+  cursor: not-allowed;
+}
+.user-input:focus{
   outline: none;
 }
 #submit{
