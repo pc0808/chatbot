@@ -1,28 +1,47 @@
 <script setup lang="ts">
-import ChatUI from './components/ChatUI.vue';
+import { ref, computed } from 'vue';
+import ChatUI from './components/ChatUI.vue'; //styles each individual message 
 const SEND_IMAGE_LINK = "../src/assets/send_icon.png";
 const DEFAULT_INTRO = "Hello! You are chatting with Groupon's AI chat bot. How may I help you today?";
+let userInput = "";
 
-const messages: Array<{msg: string, bot:boolean}> = [];
-messages.push({msg: DEFAULT_INTRO, bot:true});
+interface M{
+  msg: string,
+  bot: boolean,
+  time: Date
+}
+//array for all the messages: 
+const messages = ref<Array<M>> ([]);
+messages.value.push({msg: DEFAULT_INTRO, bot:true, time: new Date()});
+messages.value.push({msg:"huh", bot: false, time: new Date()});
+
+
+function sendInput(){
+  console.log(messages.value);
+  messages.value.push({msg: userInput, bot: false, time: new Date()}); 
+  console.log(messages.value);
+}
 </script>
 
 <template>
   <div class="container">
+    <!-- shows who you're chatting with, ai chatbot -->
     <div class="header">
       <h1>Groupon</h1>
-      <span>AI Chatbot</span>
+      <h2>AI Chatbot</h2>
     </div>
 
+    <!-- interfaces for all the messages -->
     <div class="chat-page">
-      <ChatUI msg="Incoming msg"></ChatUI>
+      <ChatUI v-for="m in messages" :msg="m.msg" :bot="m.bot" :time="m.time"><br></ChatUI>
     </div>
 
+    <!-- input ui at the bottom -->
     <div class="input">
       <div class="type-box">
-        <input id="user-input" placeholder="Start typing your inquiry here!"></input>
-        <button id="submit">
-          <img :src="SEND_IMAGE_LINK"height="25px">
+        <input id="user-input" placeholder="Start typing your inquiry here!" v-model="userInput"></input>
+        <button id="submit" @click="sendInput">
+          <img :src="SEND_IMAGE_LINK" height="25px">
         </button>
       </div>
       
@@ -40,7 +59,7 @@ template{
     background-color: var(--vt-c-white);
     border: solid 2px var(--color-border);
     width: 100vh;
-    height: 99vh;
+    height: 100vh;
 
     position: relative;
 }
@@ -51,12 +70,13 @@ template{
 }
 .chat-page{
   padding: 2% 5%;
-  position: relative;
+  max-height: 65vh;
+  overflow-y:auto
 }
 .input{
   background-color: var(--vt-c-white-mute);
   border-top: solid 2px var(--color-border);
-  padding: 2% 4.9%;
+  padding: 2% 5%;
   position: absolute;
   bottom: 0%;
   left: 0%;
@@ -66,7 +86,6 @@ template{
   font-size: medium;
   border: solid 2px var(--color-border);
   border-radius: 15px;
-  margin-left: 0.1%;
   width: 100%;
   display: inline-block;
   padding: 0%;
@@ -74,6 +93,7 @@ template{
 #user-input{
   padding: 2%;
   background: none;
+  font-size: medium;
   float: left;
   width: 88%;
   border: 0;
