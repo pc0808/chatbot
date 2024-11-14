@@ -1,9 +1,22 @@
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { onBeforeMount } from 'vue';
+import { ref } from 'vue';
+import { storeToRefs } from 'pinia';
+import { useBotStore } from "@/stores/bot";
+const botStore = useBotStore();
+const { isDisabled } = storeToRefs(botStore); 
+const { enableInput, disableInput } = useBotStore();
+//bot store is a very elaborate way to disable/enable inputs to keep up with LLM response 
 import ChatUI from './components/ChatUI.vue'; //styles each individual message 
+
+
 const SEND_IMAGE_LINK = "../src/assets/send_icon.png";
+//dummy testing phase: 
 const DEFAULT_INTRO = "Hello! You are chatting with Groupon's AI chat bot. How may I help you today?";
+const DEFAULT_RESPONSE = "Hi! We're sorry for the inconvenience, but all our agents are offline at the moment. We appreciate your patience and understanding. Feel free to leave a message, and we'll be back to assist you soon!"
+//user request:
 let userInput = "";
+//controls whether input enabled, turned off during LLM API call: 
 
 interface M{
   msg: string,
@@ -12,14 +25,24 @@ interface M{
 }
 //array for all the messages: 
 const messages = ref<Array<M>> ([]);
-messages.value.push({msg: DEFAULT_INTRO, bot:true, time: new Date()});
-messages.value.push({msg:"huh", bot: false, time: new Date()});
 
+onBeforeMount(async () => {
+  messages.value.push({msg: DEFAULT_INTRO, bot:true, time: new Date()});
+  //chatUI component enables input again!
+});
 
-function sendInput(){
-  console.log(messages.value);
+async function sendInput(){
+  //adds input to msg base, automatically renders  
   messages.value.push({msg: userInput, bot: false, time: new Date()}); 
-  console.log(messages.value);
+  
+  //disables input
+  disableInput();
+
+  //process & render response:
+  const response = DEFAULT_RESPONSE;
+  messages.value.push({msg: response, bot: true, time: new Date()} ); 
+
+  //re-enable input when chatUI comp finishes typing!
 }
 </script>
 
@@ -34,12 +57,14 @@ function sendInput(){
     <!-- interfaces for all the messages -->
     <div class="chat-page">
       <ChatUI v-for="m in messages" :msg="m.msg" :bot="m.bot" :time="m.time"><br></ChatUI>
+      <!-- loading message so user doesn't get bored  -->
+      <div v-if="isDisabled"></div> 
     </div>
 
     <!-- input ui at the bottom -->
     <div class="input">
       <div class="type-box">
-        <input id="user-input" placeholder="Start typing your inquiry here!" v-model="userInput"></input>
+        <input id="user-input" placeholder="Start typing your inquiry here!" v-model="userInput" :disabled="isDisabled"></input>
         <button id="submit" @click="sendInput">
           <img :src="SEND_IMAGE_LINK" height="25px">
         </button>

@@ -1,10 +1,29 @@
 <script setup lang="ts">
 import moment from "moment";
-defineProps<{
+import { storeToRefs } from "pinia";
+import { useBotStore } from "@/stores/bot";
+const { enableInput } = useBotStore();
+const botStore = useBotStore();
+const { isDisabled } = storeToRefs(botStore); 
+import { ref } from "vue";
+const props = defineProps<{
   msg: string,
   bot:boolean, 
   time: Date
-}>()
+}>();
+
+let typeValue = ref(""); //iterating string for bot messages to appear like "typing"
+const typeEffect = () => {
+  if (typeValue.value.length < props.msg.length) {
+    typeValue.value += props.msg.charAt(typeValue.value.length);
+    setTimeout(typeEffect, 50);
+  } else{
+    enableInput();
+  }
+  
+}
+typeEffect(); //call
+typeEffect();
 
 function convertTime(time: Date){
   return moment(time).format("MMMM Do YY, h:mm a"); 
@@ -15,7 +34,7 @@ function convertTime(time: Date){
   <div class="chat-container">
     <!-- if bot chat -->
     <div v-if="bot" class="bot-chat">
-      {{ msg }}
+      {{ typeValue }}
     </div>
     <br><span v-if="bot">{{ convertTime(time) }}</span>
 
@@ -38,7 +57,19 @@ function convertTime(time: Date){
   padding: 1% 2%;
   max-width: 50vh;
   display: inline-block;
+
+  /* typewriter fx  */
+  width: 0;
+  overflow: hidden; /* Ensure the text is not visible until the typewriter effect*/
+  animation: typing 2s steps(30) forwards;
 }
+
+/* The typing animation */
+@keyframes typing {
+  from { width: 0 }
+  to { width: 100% }
+}
+
 .my-chat{
   background-color: var(--groupon-green);
   border-radius: 15px;
