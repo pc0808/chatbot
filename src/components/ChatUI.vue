@@ -23,8 +23,10 @@ const typeEffect = () => {
   }
   
 }
-typeEffect(); //call
-typeEffect(); //enables 
+if(props.bot){
+  typeEffect(); //call
+  typeEffect(); //enables 
+}
 
 function convertTime(time: Date){
   return moment(time).format("MMMM Do, h:mm a"); 

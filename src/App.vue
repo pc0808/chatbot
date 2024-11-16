@@ -83,7 +83,7 @@ async function sendInput(){
         <input :class="{'user-input': isDisabled === false, 'user-input-disabled': isDisabled === true}" 
                 placeholder="Start typing your inquiry here!" v-model="userInput" :disabled="isDisabled"></input>
         <button id="submit" @click="sendInput">
-          <img :src="SEND_IMAGE_LINK" height="25px">
+          <img :src="SEND_IMAGE_LINK" height="25px" v-if="!isDisabled">
         </button>
       </div>
       
